@@ -1,0 +1,26 @@
+MCBSPLIB=../libs/mcbsp/lib/libmcbsp1.1.0.a
+MCBSPINCLUDE=../libs/mcbsp/
+
+
+
+CC=gcc 
+CFLAGS=-O3 -I $(MCBSPINCLUDE)
+LFLAGS=$(MCBSPLIB) -pthread -lm -lrt -lhwloc
+OBJ= mbspbench.o mbsp-discover.o mbsputil.o
+
+all: mbspbench
+
+mbspbench: $(OBJ)
+	$(CC) $(CFLAGS) -o mbspbench $(OBJ) $(LFLAGS)
+
+mbspbench.o: mbspbench.c 
+	$(CC) $(CFLAGS) -c mbspbench.c
+
+mbsp-discover.o: mbsp-discover.c mbsp-discover.h
+	$(CC) $(CFLAGS) -c mbsp-discover.c
+
+mbsputil.o: mbsputil.c  mbsputil.h
+	$(CC) $(CFLAGS) -c mbsputil.c
+
+clean:
+	rm -f *.o mbspbench
