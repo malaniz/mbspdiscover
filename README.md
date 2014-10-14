@@ -5,7 +5,6 @@ A Benchmark that discover g and L parameters of MultiBSP Architecture.
 Dependecies
 ===========
 1. mcbsp (Multicore BSP for C)
-2. jansson (JSon serializer library for C)
 3. hwloc (Hardware locality)
 
 Instalation
