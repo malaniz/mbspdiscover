@@ -184,8 +184,8 @@ void bspbench(){
         time0= bsp_time(); 
         for (iter=0; iter<NITERS; iter++){
           for (i=0; i<h; i++) {
-            bsp_get(0,  dest, destindex[i]*SZDBL, &src[i] , SZDBL);
-            bsp_get(destproc[i],  dest, destindex[i]*SZDBL, &src[i] , SZDBL);
+            //bsp_get(0,  dest, destindex[i]*SZDBL, &src[i] , SZDBL);
+            //bsp_get(destproc[i],  dest, destindex[i]*SZDBL, &src[i] , SZDBL);
             bsp_put(destproc[i],  &src[i] , dest              , destindex[i]*SZDBL, SZDBL);
           }
 
