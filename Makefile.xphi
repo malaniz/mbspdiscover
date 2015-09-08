@@ -1,10 +1,13 @@
-MCBSPLIB=../libs/mcbsp/lib/libmcbsp1.1.0.a
-MCBSPINCLUDE=../libs/mcbsp/
+MCBSPLIB=../mcbsp/lib/libmcbsp1.2.0.a
+MCBSPINCLUDE=../mcbsp/
+HWLOCLIB=/home/marcelo.alaniz/xeonphi/lib/libhwloc.so
+HWLOCINCLUDE=/home/marcelo.alaniz/xeonphi/include
 
 
-CC=gcc 
-CFLAGS=-O3 -I $(MCBSPINCLUDE)
-LFLAGS=$(MCBSPLIB) -pthread -lm -lrt -lhwloc
+
+CC=icc -mmic
+CFLAGS=-I $(MCBSPINCLUDE) -I $(HWLOCINCLUDE)
+LFLAGS=$(MCBSPLIB) -pthread -lm -lrt $(HWLOCLIB)
 OBJ= mbspbench.o mbsp-discover.o mbsputil.o
 
 all: mbspbench

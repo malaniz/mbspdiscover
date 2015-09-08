@@ -32,9 +32,9 @@ SOFTWARE.
 multibsp_tree_node_t tn2;
 multibsp_tree_node_t tnode;
 
-#define NITERS 1000     /* number of iterations */
-#define MAXN 1024      /* maximum length of DAXPY computation */
-#define MAXH 4096       /* maximum h in h-relation */
+#define NITERS 10     /* number of iterations */
+#define MAXN 256     /* maximum length of DAXPY computation */
+#define MAXH 2048       /* maximum h in h-relation */
 
 #define MEGA 1000000.0
 
@@ -100,12 +100,12 @@ void bspbench(){
     s= bsp_pid();    // s = processor number
 
     Time= vecallocd(p); bsp_push_reg(Time,p*SZDBL);
-    dest= vecallocd(2*MAXH+p); bsp_push_reg(dest,(2*MAXH+p)*SZDBL);
+    dest= vecallocd(2*(MAXH+p)); bsp_push_reg(dest,(2*(MAXH+p))*SZDBL);
     bsp_sync();
 
     // Determine r 
 
-    for (n=1; n <= MAXN; n *= 2){
+    for (n=1; n < MAXN; n *= 2){
         // Initialize scalars and vectors 
         alpha= 1.0/3.0;
         beta= 4.0/9.0;
@@ -189,12 +189,13 @@ void bspbench(){
             bsp_put(destproc[i],  &src[i] , dest              , destindex[i]*SZDBL, SZDBL);
           }
 
-          if (s == 1) 
-            bsp_get(0,  dest, destindex[i]*SZDBL, &src[i] , SZDBL);
+          //if (s == 0) 
+          //  bsp_get(0,  dest, destindex[i]*SZDBL, &src[i] , SZDBL);
 
           bsp_sync(); 
           
         }
+
         time1= bsp_time();
         time= time1-time0;
 
@@ -217,6 +218,7 @@ void bspbench(){
         leastsquares(0,p,t,&g0,&l0); 
         printf("Range h=0 to p   : g= %.1lf, l= %.1lf\n",g0,l0);
         leastsquares(p,MAXH,t,&g,&l);
+        g=(g>0)? g: g0*2;
         printf("Range h=p to HMAX: g= %.1lf, l= %.1lf\n",g,l);
         //printf("plot# %d %.1lf  %.1lf\n",tnode->level, g,l);
         printf("The bottom line for this MultiBSP component is:\n");
