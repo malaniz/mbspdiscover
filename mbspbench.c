@@ -236,10 +236,13 @@ void bspbench(){
 int main(int argc, char **argv){
     multibsp_tree_node_t  tree_root = NULL;
     int i;
+    char* strp;
 
 
     tree_root = multibsp_discover_new();
 
+    strp = multibsp_discover_print(tree_root);
+    printf("%s\n", strp);
     mcbsp_set_affinity_mode( MANUAL_AFFINITY ); // go MANUAL affinity
 
     printf("\nMBSPDiscover Benchmark\n");
