@@ -1,4 +1,4 @@
-MCBSPLIB=../mcbsp/lib/libmcbsp1.2.0.a
+MCBSPLIB=../libs/mcbsp/lib/libmcbsp1.2.0.a
 MCBSPINCLUDE=../libs/mcbsp/
 HWLOCLIB=../libs/hwloc/libhwloc.so
 HWLOCINCLUDE=../libs/hwloc/include
