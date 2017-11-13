@@ -42,7 +42,7 @@ multibsp_tree_node_t tnode;
 int P; /* number of processors requested */
 
 void leastsquares(int h0, int h1, double *t, double *g, double *l){
-    /* This function computes the parameters g and l of the 
+    /* This function computes the parameters g and l of the
        linear function T(h)= g*h+l that best fits
        the data points (h,t[h]) with h0 <= h <= h1. */
 
@@ -60,10 +60,10 @@ void leastsquares(int h0, int h1, double *t, double *g, double *l){
         sumt  += t[h];
         sumth += t[h]*h;
     }
-    sumh= (h1*h1-h0*h0+h1+h0)/2;  
+    sumh= (h1*h1-h0*h0+h1+h0)/2;
     sumhh= ( h1*(h1+1)*(2*h1+1) - (h0-1)*h0*(2*h0-1))/6;
 
-    /* Solve      nh*l +  sumh*g =  sumt 
+    /* Solve      nh*l +  sumh*g =  sumt
                 sumh*l + sumhh*g = sumth */
     if(fabs(nh)>fabs(sumh)){
         a= sumh/nh;
@@ -85,34 +85,34 @@ void bspbench(){
     int p, s, s1, iter, i, n, h, destproc[MAXH], destindex[MAXH];
     double alpha, beta, x[MAXN], y[MAXN], z[MAXN], src[MAXH], *dest,
            time0, time1, time, *Time, mintime, maxtime,
-           nflops, r, g0, l0, g, l, t[MAXH+1]; 
-  
+           nflops, r, g0, l0, g, l, t[MAXH+1];
+
     size_t pin[100];
 
-    // Determine p 
+    // Determine p
     // start: new code for pinning
     for (i=0; i< tnode->length; i++) pin[i] = tnode->sons[i]->index;
     mcbsp_set_pinning( pin, tnode->length );
     bsp_begin(tnode->length);
     // end: new code for pinning
 
-    p= bsp_nprocs(); // p = number of processors obtained 
+    p= bsp_nprocs(); // p = number of processors obtained
     s= bsp_pid();    // s = processor number
 
     Time= vecallocd(p); bsp_push_reg(Time,p*SZDBL);
     dest= vecallocd(2*(MAXH+p)); bsp_push_reg(dest,(2*(MAXH+p))*SZDBL);
     bsp_sync();
 
-    // Determine r 
+    // Determine r
 
     for (n=1; n < MAXN; n *= 2){
-        // Initialize scalars and vectors 
+        // Initialize scalars and vectors
         alpha= 1.0/3.0;
         beta= 4.0/9.0;
         for (i=0; i<n; i++){
           z[i]= y[i]= x[i]= (double)i;
         }
-        // Measure time of 2*NITERS DAXPY operations of length n 
+        // Measure time of 2*NITERS DAXPY operations of length n
         time0=bsp_time();
         for (iter=0; iter<NITERS; iter++){
           for (i=0; i<n; i++)
@@ -120,12 +120,12 @@ void bspbench(){
           for (i=0; i<n; i++)
             z[i] -= beta*x[i];
         }
-        time1= bsp_time(); 
-        time= time1-time0; 
+        time1= bsp_time();
+        time= time1-time0;
         bsp_put(0,&time,Time,s*SZDBL,SZDBL);
         bsp_sync();
 
-        // Processor 0 determines minimum, maximum, average computing rate 
+        // Processor 0 determines minimum, maximum, average computing rate
         if (s==0){
           mintime= maxtime= Time[0];
           for(s1=1; s1<p; s1++){
@@ -133,34 +133,34 @@ void bspbench(){
             maxtime= MAX(maxtime,Time[s1]);
           }
           if (mintime>0.0){
-            // Compute r = average computing rate in flop/s 
+            // Compute r = average computing rate in flop/s
             nflops= 4*NITERS*n;
             r= 0.0;
             for(s1=0; s1<p; s1++)
               r += nflops/Time[s1];
-            r /= p; 
+            r /= p;
 
             //printf("n= %5d min= %7.3lf max= %7.3lf av= %7.3lf Mflop/s ",
             //       n, nflops/(maxtime*MEGA),nflops/(mintime*MEGA), r/MEGA);
             //fflush(stdout);
-            // Output for fooling benchmark-detecting compilers 
+            // Output for fooling benchmark-detecting compilers
             printf( "", y[n-1]+z[n-1] );
-          } 
+          }
         }
       }
 
-      // Determine g and l 
+      // Determine g and l
       for (h=0; h<=MAXH; h++){
-        // Initialize communication pattern 
+        // Initialize communication pattern
         for (i=0; i<h; i++){
           src[i]= (double)i;
           if (p==1){
             destproc[i]=0;
             destindex[i]=i;
           } else {
-            // destination processor is one of the p-1 others 
+            // destination processor is one of the p-1 others
             destproc[i]= (s+1 + i%(p-1)) %p;
-            // destination index is in my own part of dest 
+            // destination index is in my own part of dest
             destindex[i]= s + (i/(p-1))*p;
           }
         }
@@ -170,18 +170,18 @@ void bspbench(){
             destproc[i]=0;
             destindex[i]=i;
           } else {
-            // destination processor is one of the p-1 others 
+            // destination processor is one of the p-1 others
             destproc[i]= (s+1 + i%(p-1)) %p;
-            // destination index is in my own part of dest 
+            // destination index is in my own part of dest
             destindex[i]= s + (i/(p-1))*p;
           }
         }
 
 
-        // Measure time of NITERS h-relations 
-        bsp_sync(); 
+        // Measure time of NITERS h-relations
+        bsp_sync();
 
-        time0= bsp_time(); 
+        time0= bsp_time();
         for (iter=0; iter<NITERS; iter++){
           for (i=0; i<h; i++) {
             //bsp_get(0,  dest, destindex[i]*SZDBL, &src[i] , SZDBL);
@@ -189,20 +189,20 @@ void bspbench(){
             bsp_put(destproc[i],  &src[i] , dest              , destindex[i]*SZDBL, SZDBL);
           }
 
-          //if (s == 0) 
+          //if (s == 0)
           //  bsp_get(0,  dest, destindex[i]*SZDBL, &src[i] , SZDBL);
 
-          bsp_sync(); 
-          
+          bsp_sync();
+
         }
 
         time1= bsp_time();
         time= time1-time0;
 
-        // Compute time of one h-relation 
+        // Compute time of one h-relation
         if (s==0){
           t[h]= (time*r)/NITERS;
-//#define SEHLOC_BENCH_VERBOSE
+#define SEHLOC_BENCH_VERBOSE
 #ifdef SEHLOC_BENCH_VERBOSE
           char strnodes[256];
           sprintf(strnodes, "");
@@ -215,7 +215,7 @@ void bspbench(){
       }
 
       if (s==0){
-        leastsquares(0,p,t,&g0,&l0); 
+        leastsquares(0,p,t,&g0,&l0);
         printf("Range h=0 to p   : g= %.1lf, l= %.1lf\n",g0,l0);
         leastsquares(p,MAXH,t,&g,&l);
         g=(g>0)? g: g0*2;
